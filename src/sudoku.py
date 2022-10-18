@@ -1,17 +1,19 @@
 
 
+from distutils.log import error
 from typing import List
 from random import choice
 
 
 class Sudoku():
-    tabuleiro: List
+    linhas: List
     colunas: List
     blocos: List
+    linhaAtual: List
 
 
     def __init__(self):
-        self.tabuleiro = [[], [], [], 
+        self.linhas = [[], [], [], 
                           [], [], [], 
                           [], [], []]
         self.colunas = [[], [], [], 
@@ -20,42 +22,24 @@ class Sudoku():
         self.blocos = [[], [], [], 
                        [], [], [], 
                        [], [], []]
+        self.linhaAtual = []
 
     
     def preencherTabuleiro(self):
-        try:
-            for i in range(9):
-                for j in range(9):
-                    teste = j
+
+        def getBloco(i: int, j: int):
+            return (j//3) + 3*(i//3)
+
+
+        for i in range(9):
+            j = 0;
+            while j < 9:
+                try:
                     opcoes = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-                    if i < 3 and j < 3:
-                        bloco = 0
-                    if i < 3 and 3 <= j < 6:
-                        bloco = 1
-                    if i < 3 and j >= 6:
-                        bloco = 2
-                    
-                    if 3 <= i < 6 and j < 3:
-                        bloco = 3
-                    if 3 <= i < 6 and 3 <= j < 6:
-                        bloco = 4
-                    if 3 <= i < 6 and j >= 6:
-                        bloco = 5
-                    
-                    if i >= 6 and j < 3:
-                        bloco = 6
-                    if i >= 6 and 3 <= j < 6:
-                        bloco = 7
-                    if i >= 6 and j >= 6:
-                        bloco = 8
-
-                    if bloco == 1 or bloco == 4 or bloco == 7:
-                        novasOpcoes = list(set(self.colunas[-1] + self.colunas[-2] + self.colunas[-3]))
-                        if novasOpcoes: opcoes = novasOpcoes
+                    bloco = getBloco(i, j)
                         
-
-                    for numero in self.tabuleiro[i]:
+                    for numero in self.linhaAtual:
                         if numero in opcoes: opcoes.remove(numero)
 
                     for numero in self.colunas[j]:
@@ -65,24 +49,33 @@ class Sudoku():
                         if numero in opcoes: opcoes.remove(numero)
                     
                     numeroSorteado = choice(opcoes)
-                    # print(F"{j} {numeroSorteado} > {opcoes}")
-                    # print(bloco)
 
-                    self.tabuleiro[i].append(numeroSorteado)
-                    self.colunas[j].append(numeroSorteado)
-                    self.blocos[bloco].append(numeroSorteado)
+                    self.linhaAtual.append(numeroSorteado)
 
-                print(f"{i} > {self.tabuleiro[i]}")
-                    # print(self.tabuleiro[i])
-                    # for i in range(9):
-                    #     print(self.tabuleiro[i])
-                    # print("")
-        except:
-            print(f"j > {teste} {opcoes}")
+                    j += 1
+
+                except IndexError as err:
+                    j = 0;
+                    self.linhaAtual = []
+            
+            for numero in self.linhaAtual:
+                j = self.linhaAtual.index(numero)
+                bloco = getBloco(i, j)
+                self.linhas[i].append(numero)
+                self.colunas[j].append(numero)
+                self.blocos[bloco].append(numero)
+            self.linhaAtual = []
+            
 
     def printTabuleiro(self):
-        for i in range(9):
-            for j in range(9):
-                print(f"{self.tabuleiro[i][j]} ", end="")
-            print("")
+        cores = ['\033[96m', '\033[37m', '\033[94m', '\033[37m', '\033[31m', '\033[35m', '\033[33m','\033[32m', '\033[30m']
 
+        try:
+            for i in range(9):
+                for j in range(9):
+                    print(cores[self.linhas[i][j]-1], f"{self.linhas[i][j]} ", end="")
+                print("")
+        except:
+            print("Erro ao printar tabuleiro")
+        
+        print('\033[0m')
