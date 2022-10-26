@@ -43,10 +43,25 @@ class Sudoku():
                        [], [], [], 
                        [], [], []]
         self.linhaAtual = []
+        for i in range(0, 9):
+            for j in range(0, 9):
+                self.linhas[i].append(0)
+                self.colunas[i].append(0)
+                self.blocos[i].append(0)
     
 
     def getBloco(self, i: int, j: int):
-        return (j//3) + 3*(i//3)
+        bloco = (j//3) + 3*(i//3)
+        posicao = 3*(i-(i//3)*3) + (j-(j//3)*3)
+        return [bloco, posicao]
+
+
+    def updateTabuleiro(self, linha, i):
+        for j, numero in enumerate(linha):
+            bloco = self.getBloco(i, j)
+            self.linhas[i][j] = numero
+            self.colunas[j][i] = numero
+            self.blocos[bloco[0]][bloco[1]] = numero
 
 
     def setTabuleiro(self):
@@ -57,7 +72,7 @@ class Sudoku():
             while j < 9:
                 try:
                     opcoes = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-                    bloco = self.getBloco(i, j)
+                    bloco = self.getBloco(i, j)[0]
                     for numero in self.linhaAtual:
                         if numero in opcoes: opcoes.remove(numero)
                     for numero in self.colunas[j]:
@@ -74,13 +89,9 @@ class Sudoku():
                     self.linhaAtual = []
                     tentativas += 1
                     if tentativas == 30:
-                        self.preencherTabuleiro()
-            for numero in self.linhaAtual:
-                j = self.linhaAtual.index(numero)
-                bloco = self.getBloco(i, j)
-                self.linhas[i].append(numero)
-                self.colunas[j].append(numero)
-                self.blocos[bloco].append(numero)
+                        self.setTabuleiro()
+                        return
+            self.updateTabuleiro(self.linhaAtual, i)
             self.linhaAtual = []
             
 
@@ -88,7 +99,7 @@ class Sudoku():
         opcoes = [{"numero": 4, "vezesEscolhidas": 0},
                   {"numero": 5, "vezesEscolhidas": 0},
                   {"numero": 6, "vezesEscolhidas": 0}]
-        for linha in self.linhas:
+        for l, linha in enumerate(self.linhas):
             posicoes = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             while True:
                 i = randint(0, 2)
@@ -100,10 +111,22 @@ class Sudoku():
                     k = choice(posicoes)
                     if k < 2: intervalo = linha[:k+3]
                     else: intervalo = linha[k-2:k+3]
-                    for i in range(1, len(intervalo)):
-                        if not (intervalo[i]==intervalo[i-1]==" "): tentativas = 9
+                    for m in range(1, len(intervalo)):
+                        if not (intervalo[m]==intervalo[m-1]==" "): tentativas = 9
                         else: 
                             tentativas += 1
                             break
                 linha[k] = " "
                 del posicoes[posicoes.index(k)]
+            self.updateTabuleiro(linha, l)
+
+    def getJson(self):
+        retorno = [[], [], [], 
+                   [], [], [], 
+                   [], [], []]
+        for i in range(9):
+            for j in range(9):
+                retorno[i].append({'valor': self.linhas[i][j], 'bloco': self.getBloco(i, j)[0]})
+        return {
+            'retorno': retorno
+        }
