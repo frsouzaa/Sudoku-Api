@@ -1,5 +1,6 @@
 
 
+from os import stat
 from typing import List
 from random import choice, randint
 
@@ -33,21 +34,10 @@ class Sudoku():
 
 
     def limparElementos(self):
-        self.linhas = [[], [], [], 
-                          [], [], [], 
-                          [], [], []]
-        self.colunas = [[], [], [], 
-                        [], [], [], 
-                        [], [], []]
-        self.blocos = [[], [], [], 
-                       [], [], [], 
-                       [], [], []]
+        self.linhas = [[0 for _ in range(9)] for _ in range(9)]
+        self.colunas = [[0 for _ in range(9)] for _ in range(9)]
+        self.blocos = [[0 for _ in range(9)] for _ in range(9)]
         self.linhaAtual = []
-        for i in range(0, 9):
-            for j in range(0, 9):
-                self.linhas[i].append(0)
-                self.colunas[i].append(0)
-                self.blocos[i].append(0)
     
 
     def getBloco(self, i: int, j: int):
@@ -83,8 +73,6 @@ class Sudoku():
                     self.linhaAtual.append(numeroSorteado)
                     j += 1
                 except IndexError as err:
-                    # print("\n",err)
-                    # self.printTabuleiro()
                     j = 0;
                     self.linhaAtual = []
                     tentativas += 1
@@ -130,3 +118,28 @@ class Sudoku():
         return {
             'retorno': retorno
         }
+
+    def checaTabuleiro(self, linhas):
+        for i in range(9):
+            self.updateTabuleiro(linhas[i], i)
+        tabuleiro = {
+            "linhas": self.linhas,
+            "colunas": self.colunas,
+            "blocos": self.blocos
+        }
+        for i in range(9):
+            for j in range(9):
+                bloco = self.getBloco(i, j)
+                if (self.linhas[i].count(linhas[i][j]) != 1) or \
+                (self.colunas[j].count(linhas[i][j]) != 1) or \
+                (self.blocos[bloco[0]].count(linhas[i][j]) != 1):
+                    return {
+                        "status": "invalido",
+                        "tabuleiro": tabuleiro,
+                        "posicao": [i, j]
+                    }
+        return {
+            "status": "ok",
+            "tabuleiro": tabuleiro
+        }
+    
