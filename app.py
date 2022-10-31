@@ -11,7 +11,7 @@ CORS(app)
 def getTabuleiroJogavel():
     sudoku = Sudoku()
     sudoku.setTabuleiro()
-    # sudoku.setTabuleiorJogavel()
+    sudoku.setTabuleiorJogavel()
     return jsonify(sudoku.getJson())
 
 

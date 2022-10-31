@@ -114,7 +114,12 @@ class Sudoku():
                    [], [], []]
         for i in range(9):
             for j in range(9):
-                retorno[i].append({'valor': self.linhas[i][j], 'bloco': self.getBloco(i, j)[0]})
+                retorno[i].append({
+                    'valor': self.linhas[i][j], 
+                    'bloco': self.getBloco(i, j)[0],
+                    'linha': i,
+                    'coluna': j
+                })
         return {
             'retorno': retorno
         }
