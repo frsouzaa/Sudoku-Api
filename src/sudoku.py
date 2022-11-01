@@ -1,6 +1,6 @@
 
 
-from os import stat
+from copy import deepcopy
 from typing import List
 from random import choice, randint
 
@@ -10,10 +10,12 @@ class Sudoku():
     colunas: List
     blocos: List
     linhaAtual: List
+    teste: List
 
 
     def __init__(self):
         self.limparElementos()
+        self.teste = []
 
     
     def __str__(self):
@@ -108,6 +110,7 @@ class Sudoku():
                 del posicoes[posicoes.index(k)]
             self.updateTabuleiro(linha, l)
 
+
     def getJson(self):
         retorno = [[], [], [], 
                    [], [], [], 
@@ -123,6 +126,7 @@ class Sudoku():
         return {
             'retorno': retorno
         }
+
 
     def checaTabuleiro(self, linhas):
         for i in range(9):
@@ -148,3 +152,30 @@ class Sudoku():
             "tabuleiro": tabuleiro
         }
     
+
+    def preencheTabuleiro(self, linhas):
+        for i in range(9):
+            self.updateTabuleiro(linhas[i], i)
+        self.preenche(linhas)
+        return {
+            "tabuleiro": self.teste
+        }
+
+
+    def preenche(self, linhas):
+        for i in range(9):
+            for j in range(9):
+                if linhas[i][j] == '':
+                    for k in range(1,10):
+                        bloco = self.getBloco(i, j)
+                        if (self.linhas[i].count(str(k)) == 0) and \
+                        (self.colunas[j].count(str(k)) == 0) and \
+                        (self.blocos[bloco[0]].count(str(k)) == 0):
+                            linhas[i][j] = str(k)
+                            self.updateTabuleiro(linhas[i], i)
+                            self.preenche(linhas)
+                            linhas[i][j] = ''
+                            self.updateTabuleiro(linhas[i], i)
+                    return
+        self.teste.append(deepcopy(linhas))
+

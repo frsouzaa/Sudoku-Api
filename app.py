@@ -19,7 +19,15 @@ def getTabuleiroJogavel():
 def validarTabuleiro():
     sudoku = Sudoku()
     tabuleiro = request.get_json()
-    status = sudoku.checaTabuleiro(tabuleiro['linha'])
+    status = sudoku.checaTabuleiro(tabuleiro['linhas'])
+    return jsonify(status)
+
+
+@app.route('/preencheTabuleiro',methods=['POST'])
+def PreencherTabuleiro():
+    sudoku = Sudoku()
+    tabuleiro = request.get_json()
+    status = sudoku.preencheTabuleiro(tabuleiro['linhas'])
     return jsonify(status)
 
 
