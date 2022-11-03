@@ -153,7 +153,8 @@ class Sudoku():
                 bloco = self.getBloco(i, j)
                 if (self.linhas[i].count(linhas[i][j]) != 1) or \
                 (self.colunas[j].count(linhas[i][j]) != 1) or \
-                (self.blocos[bloco[0]].count(linhas[i][j]) != 1):
+                (self.blocos[bloco[0]].count(linhas[i][j]) != 1) or \
+                (linhas[i][j] == ''):
                     return {
                         "status": "invalido",
                         "tabuleiro": tabuleiro,
