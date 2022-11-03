@@ -12,7 +12,7 @@ def getTabuleiroJogavel():
     sudoku = Sudoku()
     sudoku.setTabuleiro()
     sudoku.setTabuleiorJogavel()
-    return jsonify(sudoku.getJson())
+    return jsonify(sudoku.getJson(sudoku.linhas))
 
 
 @app.route('/validaTabuleiro',methods=['POST'])

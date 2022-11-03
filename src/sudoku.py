@@ -6,16 +6,17 @@ from random import choice, randint
 
 
 class Sudoku():
+    tabuleiroOriginal: List
+    tabuleiroResolvido: List
     linhas: List
     colunas: List
     blocos: List
     linhaAtual: List
-    teste: List
 
 
     def __init__(self):
         self.limparElementos()
-        self.teste = []
+        self.tabuleiroResolvido = []
 
     
     def __str__(self):
@@ -24,7 +25,7 @@ class Sudoku():
             stringFinal = ""
             for i in range(9):
                 for j in range(9):
-                    if type(self.linhas[i][j]) is str: stringFinal += f"{self.linhas[i][j]}  "
+                    if self.linhas[i][j]: stringFinal += "       "
                     else: stringFinal += f"{cores[self.linhas[i][j]-1]}{self.linhas[i][j]}  "
                 stringFinal += '\n'
         except:
@@ -48,7 +49,7 @@ class Sudoku():
         return [bloco, posicao]
 
 
-    def updateTabuleiro(self, linha, i):
+    def updateTabuleiro(self, linha: List, i: int):
         for j, numero in enumerate(linha):
             bloco = self.getBloco(i, j)
             self.linhas[i][j] = numero
@@ -83,6 +84,7 @@ class Sudoku():
                         return
             self.updateTabuleiro(self.linhaAtual, i)
             self.linhaAtual = []
+        self.tabuleiroOriginal = deepcopy(self.linhas)
             
 
     def setTabuleiorJogavel(self):
@@ -106,19 +108,29 @@ class Sudoku():
                         else: 
                             tentativas += 1
                             break
-                linha[k] = " "
+                linha[k] = ""
                 del posicoes[posicoes.index(k)]
             self.updateTabuleiro(linha, l)
+        teste = deepcopy(self.linhas)
+        for i in range(9):
+            for j in range(9):
+                teste[i][j] = str(teste[i][j])
+        self.preenche(teste)
+        if len(self.tabuleiroResolvido) > 1:
+            for i in range(9):
+                self.updateTabuleiro(self.tabuleiroOriginal[i], i)
+            self.tabuleiroResolvido.clear()
+            self.setTabuleiorJogavel()
 
 
-    def getJson(self):
+    def getJson(self, teste):
         retorno = [[], [], [], 
                    [], [], [], 
                    [], [], []]
         for i in range(9):
             for j in range(9):
                 retorno[i].append({
-                    'valor': self.linhas[i][j], 
+                    'valor': teste[i][j], 
                     'bloco': self.getBloco(i, j)[0],
                     'linha': i,
                     'coluna': j
@@ -157,25 +169,23 @@ class Sudoku():
         for i in range(9):
             self.updateTabuleiro(linhas[i], i)
         self.preenche(linhas)
-        return {
-            "tabuleiro": self.teste
-        }
+        return self.getJson(self.tabuleiroResolvido[0])
 
 
     def preenche(self, linhas):
         for i in range(9):
-            for j in range(9):
-                if linhas[i][j] == '':
+            for z in range(9):
+                if linhas[i][z] == '':
                     for k in range(1,10):
-                        bloco = self.getBloco(i, j)
+                        bloco = self.getBloco(i, z)
                         if (self.linhas[i].count(str(k)) == 0) and \
-                        (self.colunas[j].count(str(k)) == 0) and \
+                        (self.colunas[z].count(str(k)) == 0) and \
                         (self.blocos[bloco[0]].count(str(k)) == 0):
-                            linhas[i][j] = str(k)
+                            linhas[i][z] = str(k)
                             self.updateTabuleiro(linhas[i], i)
                             self.preenche(linhas)
-                            linhas[i][j] = ''
+                            linhas[i][z] = ''
                             self.updateTabuleiro(linhas[i], i)
                     return
-        self.teste.append(deepcopy(linhas))
+        self.tabuleiroResolvido.append(deepcopy(linhas))
 
