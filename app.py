@@ -7,6 +7,7 @@ from src.sudoku import Sudoku
 app = Flask(__name__)
 CORS(app)
 
+
 @app.route('/tabueleiroJogavel',methods=['GET'])
 def getTabuleiroJogavel():
     sudoku = Sudoku()
@@ -31,4 +32,8 @@ def PreencherTabuleiro():
     return jsonify(status)
 
 
-app.run(port=5000, host="localhost", debug=True)
+if __name__ == "__main__":
+    from waitress import serve
+    serve(app, host="0.0.0.0", port=8080)
+else:
+    app.run(port=8080, host="localhost", debug=True)

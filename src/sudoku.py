@@ -123,19 +123,20 @@ class Sudoku():
             self.setTabuleiorJogavel()
 
 
-    def getJson(self, teste):
+    def getJson(self, tabuleiro):
         retorno = [[], [], [], 
                    [], [], [], 
                    [], [], []]
         for i in range(9):
             for j in range(9):
                 retorno[i].append({
-                    'valor': teste[i][j], 
+                    'valor': tabuleiro[i][j], 
                     'bloco': self.getBloco(i, j)[0],
                     'linha': i,
                     'coluna': j
                 })
         return {
+            'status': 'ok',
             'retorno': retorno
         }
 
@@ -157,8 +158,8 @@ class Sudoku():
                 (linhas[i][j] == ''):
                     return {
                         "status": "invalido",
-                        "tabuleiro": tabuleiro,
-                        "posicao": [i, j]
+                        "posicao": [i, j],
+                        "menssagem": "nao possuem solucoes possiveis"
                     }
         return {
             "status": "ok",
@@ -170,6 +171,16 @@ class Sudoku():
         for i in range(9):
             self.updateTabuleiro(linhas[i], i)
         self.preenche(linhas)
+
+        if not len(self.tabuleiroResolvido):
+            return {
+                "status": "invalido",
+                "menssagem": "nao possuem solucoes possiveis"
+            }
+
+        validar = self.checaTabuleiro(deepcopy(self.tabuleiroResolvido[0]))
+        if validar["status"] == "invalido":
+            return validar
         return self.getJson(self.tabuleiroResolvido[0])
 
 
